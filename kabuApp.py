@@ -6,19 +6,19 @@ import streamlit as st
 st.title('米国株化可視化アプリ')
 
 st.sidebar.write("""
-  # 株価
+  ## 株価
 
   こちらは株価可視化ツールです。以下のオプションから表示日数を指定できます。
   """)
 
 st.sidebar.write("""
-  # 表示日数選択
+  ## 表示日数選択
   """)
 # daysにはインタラクティブに変更した値が入ってくる
 days = st.sidebar.slider('日数', 1, 100, 20)
 
 st.write(f"""
-  # 過去 **{days}日間** の株価
+  ### 過去 **{days}日間** の株価
   """)
 
 # 株価をYahoo!ファイナンスから取ってきてデータフレームに入れる関数
@@ -39,7 +39,7 @@ def get_data(days, tickers):
 
 # try:
 st.sidebar.write("""
-# 株価の範囲指定
+## 株価の範囲指定
 """)
 
 # ymin ymaxにはインタラクティブに変更した値が入ってくる
