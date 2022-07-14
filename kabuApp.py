@@ -69,7 +69,7 @@ try:
     )
 
     if not companies:
-        st.error('少なくとも一社は選んでください。')
+        st.error('少なくとも1銘柄は選んでください。')
     else:
         data = df.loc[companies]
         st.write("### 株価 (USD)", data.sort_index())
