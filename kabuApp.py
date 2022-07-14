@@ -12,13 +12,13 @@ st.sidebar.write("""
   """)
 
 st.sidebar.write("""
-  ## 表示日数選択
+  # 表示日数選択
   """)
 # daysにはインタラクティブに変更した値が入ってくる
 days = st.sidebar.slider('日数', 1, 100, 20)
 
 st.write(f"""
-  ### 過去 **{days}日間** の株価
+  # 過去 **{days}日間** の株価
   """)
 
 # 株価をYahoo!ファイナンスから取ってきてデータフレームに入れる関数
@@ -37,59 +37,59 @@ def get_data(days, tickers):
     return df
 
 
-try:
-    st.sidebar.write("""
-    ## 株価の範囲指定
-    """)
+# try:
+st.sidebar.write("""
+# 株価の範囲指定
+""")
 
-    # ymin ymaxにはインタラクティブに変更した値が入ってくる
-    ymin, ymax = st.sidebar.slider('範囲を指定ください', 0, 3000, (0, 3000))
+# ymin ymaxにはインタラクティブに変更した値が入ってくる
+ymin, ymax = st.sidebar.slider('範囲を指定ください', 0, 3000, (0, 3000))
 
-    # 取得したい株のティッカー情報
-    tickers = {
-        'VYM': 'VYM',
-        'VT': 'VT',
-        'VTI': 'VTI',
-        'SPYD': 'SPYD',
-        'HDV': 'HDV',
-        'VOO': 'VOO',
-        'apple': 'AAPL',
-        'meta': 'META',
-        'google': 'GOOGL',
-        'miclosoft': 'MSFT',
-        'netflix': 'NFLX',
-        'amazon': 'AMZN',
-        'disney': 'DIS'
+# 取得したい株のティッカー情報
+tickers = {
+    'VYM': 'VYM',
+    'VT': 'VT',
+    'VTI': 'VTI',
+    'SPYD': 'SPYD',
+    'HDV': 'HDV',
+    'VOO': 'VOO',
+    'apple': 'AAPL',
+    'meta': 'META',
+    'google': 'GOOGL',
+    'miclosoft': 'MSFT',
+    'netflix': 'NFLX',
+    'amazon': 'AMZN',
+    'disney': 'DIS'
 
-    }
+}
 
-    df = get_data(days, tickers)
+df = get_data(days, tickers)
 
-    companies = st.multiselect(
-        '銘柄を選択してください。',
-        list(df.index),
-        ['VYM', 'HDV', 'SPYD']
+companies = st.multiselect(
+    '銘柄を選択してください。',
+    list(df.index),
+    ['VYM', 'HDV', 'SPYD']
+)
+
+if not companies:
+    st.error('少なくとも1銘柄は選んでください。')
+else:
+    data = df.loc[companies]
+    st.write("### 株価(USD)", data.sort_index())
+    data = data.T.reset_index()
+    data = pd.melt(data, id_vars=['index']).rename(
+        columns={'value': 'stock prices(USD)', 'index': 'Date'}
     )
-
-    if not companies:
-        st.error('少なくとも1銘柄は選んでください。')
-    else:
-        data = df.loc[companies]
-        st.write("### 株価(USD)", data.sort_index())
-        data = data.T.reset_index()
-        data = pd.melt(data, id_vars=['index']).rename(
-            columns={'value': 'stock prices(USD)', 'index': 'Date'}
+    chart = (
+        alt.Chart(data)
+        .mark_line(opacity=0.8, clip=True)
+        .encode(
+            x="Date:T",
+            y=alt.Y("stock prices(USD):Q", stack=None,
+                    scale=alt.Scale(domain=[ymin, ymax])),
+            color='Name:N'
         )
-        chart = (
-            alt.Chart(data)
-            .mark_line(opacity=0.8, clip=True)
-            .encode(
-                x="Date:T",
-                y=alt.Y("stock prices(USD):Q", stack=None,
-                        scale=alt.Scale(domain=[ymin, ymax])),
-                color='Name:N'
-            )
-        )
-        st.altair_chart(chart, use_container_width=True)
-except:
-    st.error("おっと！何かエラーが起きているようです・・・")
+    )
+    st.altair_chart(chart, use_container_width=True)
+# except:
+#     st.error("おっと！何かエラーが起きているようです・・・")
